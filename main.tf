@@ -14,7 +14,7 @@ provider "google" {
   zone        = "us-central1-a"
 }
 
-# VPC
+# ---------------- VPC ----------------
 resource "google_compute_network" "web_app_vpc" {
   name                    = "web-app-vpc"
   auto_create_subnetworks = false
@@ -28,7 +28,7 @@ resource "google_compute_subnetwork" "web_app_subnet" {
   network       = google_compute_network.web_app_vpc.id
 }
 
-# Firewall para SSH
+# Firewall SSH
 resource "google_compute_firewall" "allow_ssh" {
   name    = "allow-ssh"
   network = google_compute_network.web_app_vpc.id
@@ -42,7 +42,7 @@ resource "google_compute_firewall" "allow_ssh" {
   target_tags   = ["ssh-server"]
 }
 
-# Firewall para HTTP
+# Firewall HTTP
 resource "google_compute_firewall" "allow_http" {
   name    = "allow-http"
   network = google_compute_network.web_app_vpc.id
@@ -56,7 +56,7 @@ resource "google_compute_firewall" "allow_http" {
   target_tags   = ["http-server"]
 }
 
-# Instancia de Compute Engine (Free Tier)
+# ---------------- VM (Free Tier) ----------------
 resource "google_compute_instance" "web_server" {
   name         = "web-server-1"
   machine_type = "f1-micro"
@@ -76,7 +76,19 @@ resource "google_compute_instance" "web_server" {
   tags = ["http-server", "ssh-server"]
 }
 
-# Seguridad IAM
+# Artifact Registry (Docker)
+resource "google_artifact_registry_repository" "docker_repo" {
+  repository_id = "det"                  
+  format        = "DOCKER"
+  location      = "us-central1"
+  description   = "Repositorio de Docker para Cloud Run"
+
+  labels = {
+    environment = "dev"
+  }
+}
+
+# ---------------- IAM Custom Role para Cloud Run ----------------
 resource "google_project_iam_custom_role" "cloudrun_admin" {
   role_id     = "cloudrunAdminCustom"
   title       = "Cloud Run Admin Custom"
@@ -91,4 +103,3 @@ resource "google_project_iam_custom_role" "cloudrun_admin" {
     "run.services.list"
   ]
 }
-

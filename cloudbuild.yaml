@@ -6,12 +6,12 @@ steps:
   # 1️⃣ Construir la imagen Docker
   - name: 'gcr.io/cloud-builders/docker'
     args:
-      ['build', '-t', 'us-central1-docker.pkg.dev/domina-entrega-total/DET/web-app:$SHORT_SHA', '.']
+      ['build', '-t', 'us-central1-docker.pkg.dev/domina-entrega-total/det/web-app:$SHORT_SHA', '.']
 
   # 2️⃣ Subir la imagen a Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
     args:
-      ['push', 'us-central1-docker.pkg.dev/domina-entrega-total/DET/web-app:$SHORT_SHA']
+      ['push', 'us-central1-docker.pkg.dev/domina-entrega-total/det/web-app:$SHORT_SHA']
 
   # 3️⃣ Desplegar en Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -19,7 +19,7 @@ steps:
     args:
       [
         'run', 'deploy', 'web-app',
-        '--image', 'us-central1-docker.pkg.dev/domina-entrega-total/DET/web-app:$SHORT_SHA',
+        '--image', 'us-central1-docker.pkg.dev/domina-entrega-total/det/web-app:$SHORT_SHA',
         '--region', 'us-central1',
         '--platform', 'managed',
         '--allow-unauthenticated',
@@ -27,4 +27,4 @@ steps:
       ]
 
 images:
-  - 'us-central1-docker.pkg.dev/domina-entrega-total/DET/web-app:$SHORT_SHA'
+  - 'us-central1-docker.pkg.dev/domina-entrega-total/det/web-app:$SHORT_SHA'
