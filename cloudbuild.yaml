@@ -1,20 +1,30 @@
+# cloudbuild.yaml
+options:
+  logging: CLOUD_LOGGING_ONLY            # Evita el error de logs
+
 steps:
+  # 1️⃣ Construir la imagen Docker
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'us-central1-docker.pkg.dev/domina-entrega-total/Artifact_Registry/det:$SHORT_SHA', '.']
+    args:
+      ['build', '-t', 'us-central1-docker.pkg.dev/domina-entrega-total/DET/web-app:$SHORT_SHA', '.']
 
+  # 2️⃣ Subir la imagen a Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'us-central1-docker.pkg.dev/domina-entrega-total/Artifact_Registry/det:$SHORT_SHA']
+    args:
+      ['push', 'us-central1-docker.pkg.dev/domina-entrega-total/DET/web-app:$SHORT_SHA']
 
+  # 3️⃣ Desplegar en Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
     args:
       [
-        'run', 'deploy', 'det',
-        '--image', 'us-central1-docker.pkg.dev/domina-entrega-total/Artifact_Registry/det:$SHORT_SHA',
+        'run', 'deploy', 'web-app',
+        '--image', 'us-central1-docker.pkg.dev/domina-entrega-total/DET/web-app:$SHORT_SHA',
+        '--region', 'us-central1',
         '--platform', 'managed',
-        '--us-central1', 'us-central1',
         '--allow-unauthenticated',
-        '--ingress', 'all-traffic',
+        '--port', '8080'
       ]
+
 images:
-  - 'us-central1-docker.pkg.dev/domina-entrega-total/Artifact_Registry/det:$SHORT_SHA'
+  - 'us-central1-docker.pkg.dev/domina-entrega-total/DET/web-app:$SHORT_SHA'
