@@ -75,3 +75,20 @@ resource "google_compute_instance" "web_server" {
 
   tags = ["http-server", "ssh-server"]
 }
+
+# Seguridad IAM
+resource "google_project_iam_custom_role" "cloudrun_admin" {
+  role_id     = "cloudrunAdminCustom"
+  title       = "Cloud Run Admin Custom"
+  description = "Permite solo administrar servicios de Cloud Run"
+  project     = "domina-entrega-total"
+
+  permissions = [
+    "run.services.create",
+    "run.services.update",
+    "run.services.get",
+    "run.services.delete",
+    "run.services.list"
+  ]
+}
+

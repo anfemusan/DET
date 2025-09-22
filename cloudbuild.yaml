@@ -1,0 +1,20 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'us-central1-docker.pkg.dev/domina-entrega-total/Artifact_Registry/det:$SHORT_SHA', '.']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'us-central1-docker.pkg.dev/domina-entrega-total/Artifact_Registry/det:$SHORT_SHA']
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      [
+        'run', 'deploy', 'det',
+        '--image', 'us-central1-docker.pkg.dev/domina-entrega-total/Artifact_Registry/det:$SHORT_SHA',
+        '--platform', 'managed',
+        '--us-central1', 'us-central1',
+        '--allow-unauthenticated',
+        '--ingress', 'all-traffic',
+      ]
+images:
+  - 'us-central1-docker.pkg.dev/domina-entrega-total/Artifact_Registry/det:$SHORT_SHA'
